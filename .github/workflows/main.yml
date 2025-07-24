@@ -1,30 +1,33 @@
-name: .NET Core CI
+name: Build and Deploy .NET App to Azure
 
 on:
   push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+    branches:
+      - main
 
 jobs:
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v2
 
     - name: Setup .NET
       uses: actions/setup-dotnet@v3
       with:
-        dotnet-version: 8.0.x
+        dotnet-version: '8.0.x'
 
-    - name: Restore dependencies
-      run: dotnet restore CodeFlowLabsWebApp/CodeFlowLabsWebApp.csproj
+    - name: Login to Azure
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-    - name: Build
-      run: dotnet build CodeFlowLabsWebApp/CodeFlowLabsWebApp.csproj --no-restore
+    - name: Publish .NET app
+      run: dotnet publish CodeFlowLabsWebApp/CodeFlowLabsWebApp.csproj -c Release -o publish
 
-    - name: Test
-      run: dotnet test --no-build --verbosity normal
-      working-directory: CodeFlowLabsWebApp
+    - name: Deploy to Azure Web App
+      uses: azure/webapps-deploy@v2
+      with:
+        app-name: codeflowlabswebapp
+        package: ./publish
