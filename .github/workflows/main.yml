@@ -10,24 +10,25 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
+    - name: 📦 Checkout code
       uses: actions/checkout@v2
 
-    - name: Setup .NET
+    - name: ⚙️ Setup .NET
       uses: actions/setup-dotnet@v3
       with:
         dotnet-version: '8.0.x'
 
-    - name: Login to Azure
+    - name: 🔐 Login to Azure
       uses: azure/login@v1
       with:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-    - name: Publish .NET app
+    - name: 🛠️ Publish .NET app
       run: dotnet publish CodeFlowLabsWebApp/CodeFlowLabsWebApp.csproj -c Release -o publish
 
-    - name: Deploy to Azure Web App
+    - name: 🚀 Deploy to Azure Web App
       uses: azure/webapps-deploy@v2
       with:
-        app-name: codeflowlabswebapp
+        app-name: dntwebapp
         package: ./publish
+        resource-group-name: rg-pract
